@@ -1,0 +1,290 @@
+Title : Project Report: Deadlock Detection and Recovery Toolkit
+
+
+# Project Overview:-
+ A deadlock occurs when two or more processes are stuck waiting for resources held by
+ each other, causing the system to freeze and halt execution. Traditional deadlock detection
+ methods rely on static algorithms such as Wait-For Graphs, Resource Allocation Matrices, and
+ Banker's Algorithm, but these approaches struggle in dynamic and large-scale systems, especially 
+ cloud and distributed environments where resource usage changes rapidly. The Deadlock Detection
+ and Recovery Toolkit System aims to intelligently monitor process behavior and resource
+ allocation using machine learning models. Instead of detecting deadlocks after they occur,
+ this system focuses on predictive detection, where patterns, anomalies, and historical data 
+ are analyzed to identify potential deadlocks before they impact performance.
+
+
+#Goals of the Project :- 
+ .Detect deadlocks in real-time with higher accuracy compared to traditional algorithms.
+
+ .Predict potential deadlocks using machine learning models (e.g., classification, anomaly detection).
+
+ .Improve overall system reliability and reduce performance degradation due to blocked processes. 
+
+ .Provide visualization tools and alerts to system administrators for better decision-making.
+
+ .Integrate traditional OS-level monitoring Project Scope
+
+#Project Scope:- 
+  .This project focuses on building an intelligent system that monitors system processes, analyzes 
+    resource usage data, and uses machine learning to detect and predict deadlocks in real time. 
+
+  .It involves collecting system logs, converting them into useful features, and training models to
+   identify patterns that lead to deadlocks. 
+
+ .The system will be integrated with a simulated environment and will provide warnings through a dashboard
+   interface.
+
+  .Finally, the project compares the approach with traditional deadlock detection methods to
+   show improvements in accuracy and performance.
+
+# Expected Outcomes :- 
+ .A working system that detects deadlocks and predicts them in advance. 
+ .A model capable of identifying resource patterns leading to circular waits. 
+ .Real-time dashboard showing system processes, resource allocation, and alerts. 
+ .Improved throughput and reduced system downtime.
+ .Experimental results demonstrating performance improvement over traditional approaches.
+
+# Module-Wise Breakdown:- 
+   Module 1: System Monitoring & Data Collection :
+        *Purpose: To continuously track system processes and resource usage that may lead to deadlocks. 
+        *Role in the Project: 
+           .Monitors running processes, resource allocation, lock requests, and wait states.
+           .Collects real-time logs and historical data related to resource utilization. 
+           .Sends structured data to the Machine Learning module for analysis. 
+           .This module acts as the data source for prediction and detection.
+   
+  Module 2: Deadlock Detection and Recovery Toolkit :
+        *Purpose: To analyze system data and use machine learning to identify or predict deadlocks.
+        *Role in the Project:
+             .Preprocesses and converts raw logs into meaningful features. 
+             .Applies ML models (e.g., Decision Trees, Random Forest, Neural Networks) to detect patterns. 
+             .Predicts potential deadlock scenarios and identifies ongoing deadlocks. 
+             .Outputs status codes such as Normal, Warning, or Deadlock Detected. 
+             .This module forms the intelligence layer of the system.
+
+ Module 3: Visualization & User Interface : 
+       *Purpose: To display system status, alerts, and patterns in a clear visual format.
+       *Role in the Project:
+             .Provides a dashboard showing processes, resource flow, and alerts. 
+             .Visualizes wait-for graphs, resource usage trends, and prediction results. 
+             .Allows users to view logs, track history, and take corrective actions if implemented. 
+             .This module improves usability and helps administrators interpret results easily. 
+# Functionalities : 
+   Module 1: System Monitoring & Data Collection : 
+          .Process tracking
+          .Resource allocation tracking 
+          .Event logging
+          .Data preprocessing 
+          .Dataset generation
+  
+   Module 2: AI-Based Detection & Prediction Feature
+          .Feature extraction 
+          .Model training 
+          .Deadlock detection 
+          .Deadlock prediction 
+          .Risk classification
+
+   Module 3: Visualization & UI 
+          .Dashboard display 
+          .Graph visualization 
+          .Alerts & notifications 
+          .Log history view 
+          .Manual control actions (optional)
+
+# Technology Used :  
+    .Programming Languages: Python, HTML, CSS, JavaScript (for UI). 
+    .Libraries and Tools: psutil, pandas, numpy, scikit-learn, matplotlib / Plotly, Flask / Django. 
+    .Other Tools: GitHub, VS Code, Jupyter Notebook, MySQL / SQLite (optional).
+
+
+# Conclusion :
+     The Deadlock-Detection-and-Recovery-Toolkit System helps detect and predict deadlocks more
+        efficiently than traditional methods by using machine learning and real-time monitoring. 
+
+#Future Scope: 
+    Integration with real operating systems, use of advanced AI models, expansion to cloud/distributed
+    systems, and inclusion of automatic recovery solutions.
+
+
+#Code :-
+
+import streamlit as st [cite: 242]
+import pandas as pd [cite: 242]
+import numpy as np [cite: 242]
+import time [cite: 242]
+
+# Page Configuration [cite: 242]
+st.set_page_config(
+    page_title="Deadlock Simulation",
+    page_icon="🔵",
+    layout="wide",
+    initial_sidebar_state="collapsed"
+) [cite: 242]
+
+# Custom CSS for Styling [cite: 242]
+st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+    
+    .result-box-safe {
+        background-color: #ecfdf5;
+        border: 2px solid #10b981;
+        padding: 20px;
+        border-radius: 10px;
+        color: #064e3b;
+        text-align: center;
+        margin-top: 20px;
+    }
+</style>
+""", unsafe_allow_html=True) [cite: 242]
+
+st.title("🔵 Deadlock Simulation") [cite: 242]
+
+st.markdown("""
+This page simulates **Banker's Algorithm** for:
+- ✅ Single-instance resources [cite: 242]
+- ✅ Multiple-instance resources [cite: 242]
+
+You first specify **total capacity** of each resource, then how many resources are **allocated** to each process and what each process is currently **requesting (remaining need)**. 
+The app automatically computes **Available** and checks for **deadlock**.
+""") [cite: 242]
+
+st.markdown("---") [cite: 242]
+
+# Module 1: System Configuration [cite: 242]
+with st.container(border=True):
+    st.subheader("⚙️ System Configuration") [cite: 242]
+    col_mode, col_p, col_r = st.columns([1.5, 1, 1]) [cite: 242]
+    
+    with col_mode:
+        mode = st.radio(
+            "Resource Type",
+            ["Single Instance", "Multiple Instance"],
+            horizontal=True
+        ) [cite: 242]
+        
+    with col_p:
+        num_processes = st.number_input(
+            "Number of Processes (P)",
+            min_value=2, max_value=10, value=3, step=1
+        ) [cite: 242]
+        
+    with col_r:
+        num_resources = st.number_input(
+            "Number of Resources (R)",
+            min_value=1, max_value=10, value=3, step=1
+        ) [cite: 242]
+
+st.markdown("<br>", unsafe_allow_html=True) [cite: 242]
+
+# Module 2: Total Resource Capacity [cite: 242]
+with st.container(border=True):
+    st.subheader("🔢 Total Resource Capacity") [cite: 242]
+    st.caption("Maximum number of instances available for each resource type.") [cite: 242]
+    
+    total_resources = [] [cite: 242]
+    total_cols = st.columns(num_resources) [cite: 242]
+    for j, col in enumerate(total_cols):
+        with col:
+            val = st.number_input(
+                f"R{j} (Total Capacity)",
+                min_value=1,
+                max_value=100,
+                value=7 if j == 0 else 5,
+                step=1,
+                key=f"total_r{j}"
+            ) [cite: 242]
+            total_resources.append(val) [cite: 242]
+            
+    total = np.array(total_resources, dtype=int) [cite: 242]
+
+st.markdown("<br>", unsafe_allow_html=True) [cite: 242]
+
+# Module 3: Current System State [cite: 242]
+st.subheader("📊 Current System State") [cite: 242]
+col_alloc, col_req = st.columns(2) [cite: 242]
+
+with col_alloc:
+    st.info("🟦 Allocation Matrix (Resources currently held)") [cite: 242]
+    default_alloc = pd.DataFrame(
+        0,
+        index=[f"P{i}" for i in range(num_processes)],
+        columns=[f"R{j}" for j in range(num_resources)]
+    ) [cite: 242]
+    alloc_df = st.data_editor(
+        default_alloc,
+        num_rows="fixed",
+        use_container_width=True,
+        key="alloc_editor"
+    ) [cite: 242]
+
+with col_req:
+    st.warning("🟧 Request Matrix (Remaining resources needed to finish)") [cite: 242]
+    default_req = pd.DataFrame(
+        0,
+        index=[f"P{i}" for i in range(num_processes)],
+        columns=[f"R{j}" for j in range(num_resources)]
+    ) [cite: 242]
+    req_df = st.data_editor(
+        default_req,
+        num_rows="fixed",
+        use_container_width=True,
+        key="req_editor"
+    ) [cite: 242]
+
+st.markdown("---") [cite: 242]
+
+# Automatically Computed Available Resources [cite: 242]
+st.subheader("💡 Automatically Computed Available Resources") [cite: 242]
+alloc = alloc_df.to_numpy(dtype=int) [cite: 242]
+req = req_df.to_numpy(dtype=int) [cite: 242]
+
+allocated_sum = alloc.sum(axis=0) [cite: 242]
+available = total - allocated_sum [cite: 242]
+
+avail_cols = st.columns(num_resources) [cite: 242]
+for j, col in enumerate(avail_cols):
+    with col:
+        st.metric(label=f"Available R{j}", value=available[j]) [cite: 242]
+
+# Deadlock Detection Logic [cite: 242]
+def check_deadlock(total_vec, alloc_mat, req_mat):
+    n, m = alloc_mat.shape [cite: 242]
+    work = total_vec - alloc_mat.sum(axis=0) [cite: 242]
+    finish = np.array([False] * n) [cite: 242]
+    safe_seq = [] [cite: 242]
+    
+    changed = True [cite: 242]
+    while changed:
+        changed = False [cite: 242]
+        for i in range(n):
+            if not finish[i] and np.all(req_mat[i] <= work):
+                work = work + alloc_mat[i] [cite: 242]
+                finish[i] = True [cite: 242]
+                safe_seq.append(f"P{i}") [cite: 242]
+                changed = True [cite: 242]
+                
+    deadlocked = [f"P{i}" for i in range(n) if not finish[i]] [cite: 242]
+    is_deadlock = len(deadlocked) > 0 [cite: 242]
+    return is_deadlock, safe_seq, deadlocked, work [cite: 242]
+
+# Execution and Session State [cite: 242]
+run_btn = st.button("Run Detection Algorithm", type="primary") [cite: 242]
+
+if run_btn:
+    st.session_state["last_state"] = {
+        "total": total.tolist(),
+        "alloc": alloc.tolist(),
+        "req": req.tolist(),
+    } [cite: 242]
+    
+    is_dead, sequence, blocked, final_work = check_deadlock(total, alloc, req)
+    
+    if is_dead:
+        st.error(f"Deadlock Detected! Blocked Processes: {', '.join(blocked)}")
+    else:
+        st.success(f"System is in a Safe State. Sequence: {' -> '.join(sequence)}")
+
+
+#LIVE PROJECT LINK: https://deadlock-detection-and-recovery-toolkit-proj.streamlit.app/
